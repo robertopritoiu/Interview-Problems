@@ -1,0 +1,237 @@
+﻿<html>
+<head>
+    <title>The Amazing World of Numbers</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A very useful number generator that displays odd and even numbers">
+<style type="text/css">
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #wrapper {
+        text-align: center;
+    }
+
+    #mainheader {
+        margin-top: 50px;
+    }
+
+    #descriptionArea {
+        margin-bottom: 30px;
+    }
+
+    #displayNumbersBox {
+        display: inline-block;
+        background-color: #d3d3d3;
+        border: 1px solid #000;
+        margin: 0 auto;
+        padding: 5px;
+        max-width: 600px;
+        margin-bottom: 20px;
+        /*font-size: 20px;*/
+    }
+
+    #numberTypeDiv {
+        width: 150px;
+        margin: 10px auto;
+    }
+
+    #whichToDisplay {
+        width: 300px;
+        margin: 0 auto;
+    }
+
+    #numberErrorDiv {
+        color: #ff0000;
+        visibility: hidden;
+    }
+
+    #startingNumberBox {
+        margin-right: 5px;
+    }
+
+    #selectOdds {
+        background-color: #d3d3d3;
+    }
+
+    .numberInputBox {
+        border: 1px solid #000;
+        width: 50px;
+        height: 20px;
+        padding: 5px;
+        float: left;
+        cursor: text;
+        text-align: center;
+    }
+
+    .greyOnHover:hover {
+        background-color: #d3d3d3;
+    }
+
+    .selectNumberType {
+        width: 100px;
+        height: 25px;
+        float: left;
+        border: 1px solid #000;
+        line-height: 25px;
+        cursor: pointer;
+    }
+
+    .selectNumberType:first-child {
+        margin-left: 25px;
+        margin-right: 10px;
+    }
+</style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="mainheader"><h1>Welcome to the Amazing World of Numbers!</h1></div>
+        <div id="descriptionArea">
+        This page is created to display odd and even numbers as simply as possible. <br />
+        There are quite a few options available to you, so please feel free to customize as you wish.<br />
+        You will see the result immediately upon any changes, and can also view the results in the console as well.<br /><br />
+            Please select the start and final number you want to itterate over:
+            <div id="numberTypeDiv">
+                <input type="text" id="startingNumberBox" class="numberInputBox greyOnHover" placeholder="0" value="0">
+                <input type="text" id="endingNumberBox" class="numberInputBox greyOnHover" placeholder="100" value="100"><br />
+            </div>
+            <div id="numberErrorDiv">Placeholding text that is invisible</div>
+            <p>Please select the type of numbers you would like to be displayed:</p>
+            <div id="whichToDisplay">
+                <div id="selectOdds" class="selectNumberType greyOnHover">Odds</div>
+                <div id="selectEvens" class="selectNumberType greyOnHover">Evens</div>
+            </div><br />
+        </div>
+        <div id="displayNumbersBox"></div>
+    </div>
+<script type="text/javascript">
+
+    var startNr = 0;
+    var endNr = 100;
+    var errorTimer; // This will be our timer to make the error message disappear.
+
+    var displayType = "odds";
+    var displayNumbersBox = document.getElementById("displayNumbersBox");
+    var numberErrorDiv = document.getElementById("numberErrorDiv");
+
+    var startingNumberBox = document.getElementById("startingNumberBox");
+    startingNumberBox.onkeypress = isNumber;
+    startingNumberBox.onkeyup = changeStartNumber;
+    startingNumberBox.onclick = selectAllContent;
+
+    var endingNumberBox = document.getElementById("endingNumberBox");
+    endingNumberBox.onkeypress = isNumber;
+    endingNumberBox.onkeyup = changeEndNumber;
+    //endingNumberBox.onclick = selectAllContent;
+
+    var selectOdds = document.getElementById("selectOdds");
+    selectOdds.onclick = changeNumberType;
+    selectOdds.nrType = "odds";
+
+    var selectEvens = document.getElementById("selectEvens");
+    selectEvens.onclick = changeNumberType;
+    selectEvens.nrType = "evens";
+
+    function changeDisplayNumbers() {
+        var finalNrList = "";
+        displayNumbersBox.textContent = "";
+        if (displayType == "odds") {
+            for (var i = startNr, j = endNr; i <= j; i++) {
+                if (i % 2) { // Definitely use modulus over a simple hack, much easier and scales infinitely.
+                    finalNrList += i + ", ";
+                }
+            }
+        } else if (displayType == "evens") {
+            for (var i = startNr, j = endNr; i <= j; i++) {
+                if (i % 2 == false) {
+                    finalNrList += i + ", ";
+                }
+            }
+        }
+        finalNrList = finalNrList.slice(0, -2); //Removes the last 2 characters off our string, in our case it will always be ", ", note that the space is one character also.
+        displayNumbersBox.textContent = finalNrList;
+        console.clear();
+        console.log(finalNrList);
+    }
+    changeDisplayNumbers();
+
+    function changeNumberType() {
+        displayType = this.nrType;
+        if (displayType == "odds") {
+            selectOdds.style.backgroundColor = "#d3d3d3";
+            selectEvens.style.backgroundColor = "fff";
+        } else {
+            selectOdds.style.backgroundColor = "#fff";
+            selectEvens.style.backgroundColor = "d3d3d3";
+        }
+
+        changeDisplayNumbers();
+    }
+
+    function selectAllContent() {
+        this.select();
+    }
+
+    function removeErrorMsg() {
+        //numberErrorDiv.textContent = "";
+        numberErrorDiv.style.visibility = "hidden"; //The reason behind this is to keep the page the same and not have everything move down when it appears or up when it's empty.
+    }
+        
+
+    function changeStartNumber() {
+        var testNr = startingNumberBox.value + ""; // Turn into a string so we can check the first character
+        if (testNr[0] == 0) { // remove the annoying first 0 that remains sometimes
+            testNr = testNr.substr(1); //Removing the first character if there is a 0
+        }
+        testNr = Number(testNr);
+        if (testNr > 9999) {
+            testNr = 9999;
+        }
+        if( +testNr < +endNr ) {
+            startNr = Number(testNr); //Just making sure it's a number so no weird problems;
+        } else {
+            numberErrorDiv.textContent = "The starting number cannot be bigger than the ending number";
+            numberErrorDiv.style.visibility = "visible";
+            clearTimeout(errorTimer);
+            errorTimer = setTimeout(removeErrorMsg, 3000);
+        }
+        startingNumberBox.value = startNr;
+        changeDisplayNumbers();
+    }
+
+    function changeEndNumber() {
+        var testNr = endingNumberBox.value + "";
+        if (testNr[0] == 0) {
+            testNr = testNr.substr(1); 
+        }
+        testNr = Number(testNr); 
+        if (testNr > 9999) {
+            testNr = 9999;
+        }
+        if (testNr > +startNr ) {
+            endNr = Number(testNr);
+        } else {
+            numberErrorDiv.textContent = "The ending number cannot be smaller than the starting number";
+            numberErrorDiv.style.visibility = "visible";
+            clearTimeout(errorTimer);
+            errorTimer = setTimeout(removeErrorMsg, 3000);
+        }
+        endingNumberBox.value = endNr;
+        changeDisplayNumbers();
+    }
+
+    function isNumber(event) { //Checks if the key pressed is a number or not, returns only if it's a number.
+        event = (event) ? event : window.event;
+        var charCode = (event.which) ? event.which : event.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            numberErrorDiv.textContent = "Only numbers are allowed";
+            clearTimeout(errorTimer);
+            errorTimer = setTimeout(removeErrorMsg, 3000);
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

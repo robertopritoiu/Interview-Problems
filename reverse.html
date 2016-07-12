@@ -1,0 +1,128 @@
+﻿<html>
+<head>
+    <title>The Amazing World of Numbers</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="I'm who they go to when they need their strings reversed.">
+    <style type="text/css">
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #wrapper {
+        text-align: center;
+    }
+
+    #mainheader {
+        margin-top: 50px;
+    }
+
+    #inputContainer {
+        width: 810px;
+        height: 310px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    #mainTextArea {
+        margin-right: 10px;
+    }
+
+    #errorMsg {
+        color: red;
+        margin-top: 30px;
+        font-size: 24px;
+        visibility: hidden;
+    }
+
+    #charLimit {
+        position: absolute;
+        left: 335px;
+        top: 280px;
+        width: 45px;
+        font-size: 12px;
+        color: #7e7e7e;
+        text-align: right;
+    }
+
+    .inputTextArea {
+        border-radius: 15px;
+        outline: none;
+	    resize: none;
+        box-shadow: 0px 0px 3px 2px #000;
+        width: 400px;
+	    height: 300px;
+        float: left;
+    }
+
+    input[type="text"] {
+        display: inline;
+        box-sizing: border-box;
+        -webkit-box-sizing:border-box;
+        -moz-box-sizing: border-box;
+	    padding: 10px;
+	    margin: 0;
+	    text-align: center;
+	    border: none;
+	    font-size: 16px;
+    }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="mainheader"><h1>Welcome to the Amazing World of Reversibility!</h1><br />
+        Note: The maximum number of characters you can reverse is 100.<br /><br />
+        Fun tip: aibohphobia is written the same backwards!
+        </div>
+        <br />
+        <div id="inputContainer">
+            <div id="charLimit">0 / 50</div>
+                <input type="text" id="mainTextArea" class="inputTextArea" placeholder="Write any text you would like reversed in this box!">
+                <input type="text" id="outTextArea" class="inputTextArea" placeholder="and you will see it displayed in reverse in this box!">
+            </div>
+        <div id="errorMsg">You can only write 50 characters!</div> <!--Wanted to allow more, but didn't want you to hold the key down to check if you ever get the error-->
+    </div>
+    <script type="text/javascript">
+        var mainTextArea = document.getElementById("mainTextArea");
+        var outTextArea = document.getElementById("outTextArea");
+        var charLimit = document.getElementById("charLimit");
+        var errorTimer;
+        var currentChars = 0;
+
+
+        mainTextArea.onkeypress = checkLimit; //Adding a pre-check so that we don't use a hack to remove the last character after it was added. In this case it simply doesn't add the character to begin with.
+        mainTextArea.onkeyup = reverseTheText;
+
+        function checkLimit() {
+            var text = mainTextArea.value;
+            if (text.length > 49) {
+                errorMsg.style.visibility = "visible";
+                clearTimeout(errorTimer);
+                errorTimer = setTimeout(removeErrorMsg, 2500);
+                return false;
+            }
+           
+        }
+
+        function reverseTheText() {
+            console.time("How long it takes to reverse this: ");
+            var text = mainTextArea.value;
+            
+            text = text.split(""); //Split the text into individual characters in an array so we can use the .reverse()
+
+            text = text.reverse(); //Reverse the array
+
+            text = text.join(""); //Join all the elements of the array into a string
+
+            outTextArea.value = text;
+            currentChars = text.length;
+            charLimit.textContent = text.length + " / 50"; //Getting the exact length is easier and safer in this case, since arrow keys and any key press would add one with ++, even if they didn't actually add a character.
+            console.timeEnd("How long it takes to reverse this: ");
+        }
+
+        function removeErrorMsg() {
+            errorMsg.style.visibility = "hidden";
+        }
+    </script>
+</body>
+</html>
