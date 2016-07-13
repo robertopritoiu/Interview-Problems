@@ -106,7 +106,8 @@
         <div id="displayNumbersBox"></div>
     </div>
 <script type="text/javascript">
-
+    var startNr = 0;
+    var endNr = 100;
     var errorTimer; // This will be our timer to make the error message disappear.
 
     var displayType = "odds";
@@ -114,13 +115,11 @@
     var numberErrorDiv = document.getElementById("numberErrorDiv");
 
     var startingNumberBox = document.getElementById("startingNumberBox");
-    startingNumberBox.startNr = 0;
     startingNumberBox.onkeypress = isNumber;
     startingNumberBox.onkeyup = changeStartNumber;
     startingNumberBox.onclick = selectAllContent;
 
     var endingNumberBox = document.getElementById("endingNumberBox");
-    endingNumberBox.endNr = 100;
     endingNumberBox.onkeypress = isNumber;
     endingNumberBox.onkeyup = changeEndNumber;
     //endingNumberBox.onclick = selectAllContent;
@@ -151,7 +150,7 @@
         }
         finalNrList = finalNrList.slice(0, -2); //Removes the last 2 characters off our string, in our case it will always be ", ", note that the space is one character also.
         displayNumbersBox.textContent = finalNrList;
-        console.clear();
+        //console.clear();
         console.log(finalNrList);
     }
     changeDisplayNumbers();
@@ -165,64 +164,33 @@
             selectOdds.style.backgroundColor = "#fff";
             selectEvens.style.backgroundColor = "d3d3d3";
         }
-
         changeDisplayNumbers();
     }
 
     function selectAllContent() {
-        this.select();
+        if (startNr === 0) {
+            this.select();
+        }
     }
 
     function removeErrorMsg() {
         //numberErrorDiv.textContent = "";
-        numberErrorDiv.style.visibility = "hidden"; //The reason behind this is to keep the page the same and not have everything move down when it appears or up when it's empty.
-    }
-        
-    function changeNumbers() {
-        var testNr;
-        if (this.startNr) {
-            testNr = startingNumberBox.value + "";
-            if (testNr > 9999)
-                testNr = 9999;
-            if (testNr < this.endNr) {
-                startNr = testNr;
-            } else {
-                numberErrorDiv.textContent = "The starting number cannot be bigger than the ending number";
-            }
-            startingNumberBox.value = testNr;
-        } else if (this.endNr) {
-            testNr = endingNumberBox.value + "";
-            if (testNr > 9999)
-                testNr = 9999;
-            if (testNr > this.startNr) {
-                endNr = testNr;
-            } else {
-                numberErrorDiv.textContent = "The ending number cannot be smaller than the starting number";
-            }
-            endingNumberBox.value = testNr;
-        }
-        numberErrorDiv.style.visibility = "visible";
-        clearTimeout(errorTimer);
-        errorTimer = setTimeout(removeErrorMsg, 3000);
-        changeDisplayNumbers();
+        numberErrorDiv.style.visibility = "hidden"; //The reason behind this is to keep the page the same after a change and not have everything move down when it appears or up when it's empty.
     }
 
     function changeStartNumber() {
-        var testNr = startingNumberBox.value + ""; // Turn into a string so we can check the first character
-        if (testNr[0] == 0) { // remove the annoying first 0 that remains sometimes
-            testNr = testNr.substr(1); //Removing the first character if there is a 0
-        }
+        var testNr = startingNumberBox.value + "";
         testNr = Number(testNr);
         if (testNr > 9999) {
             testNr = 9999;
+        } else if (testNr == "") {
+            testNr = 0;
         }
-        if( +testNr < +endNr ) {
-            startNr = Number(testNr); //Just making sure it's a number so no weird problems;
+        if (testNr < endNr) {
+            startNr = testNr;
         } else {
             numberErrorDiv.textContent = "The starting number cannot be bigger than the ending number";
-            numberErrorDiv.style.visibility = "visible";
-            clearTimeout(errorTimer);
-            errorTimer = setTimeout(removeErrorMsg, 3000);
+            showErrorMessage();
         }
         startingNumberBox.value = startNr;
         changeDisplayNumbers();
@@ -230,20 +198,23 @@
 
     function changeEndNumber() {
         var testNr = endingNumberBox.value + "";
-        testNr = Number(testNr); 
-        if (testNr > 9999) {
+        testNr = Number(testNr);
+        if (testNr > 9999)
             testNr = 9999;
-        }
-        if (testNr > startNr ) {
+        if (testNr > startNr) {
             endNr = testNr;
         } else {
             numberErrorDiv.textContent = "The ending number cannot be smaller than the starting number";
-            numberErrorDiv.style.visibility = "visible";
-            clearTimeout(errorTimer);
-            errorTimer = setTimeout(removeErrorMsg, 3000);
+            showErrorMessage();
         }
         endingNumberBox.value = endNr;
         changeDisplayNumbers();
+    }
+
+    function showErrorMessage() {
+        numberErrorDiv.style.visibility = "visible";
+        clearTimeout(errorTimer);
+        errorTimer = setTimeout(removeErrorMsg, 3000);
     }
 
     function isNumber(event) { //Checks if the key pressed is a number or not, returns only if it's a number.
