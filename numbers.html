@@ -107,8 +107,6 @@
     </div>
 <script type="text/javascript">
 
-    var startNr = 0;
-    var endNr = 100;
     var errorTimer; // This will be our timer to make the error message disappear.
 
     var displayType = "odds";
@@ -116,11 +114,13 @@
     var numberErrorDiv = document.getElementById("numberErrorDiv");
 
     var startingNumberBox = document.getElementById("startingNumberBox");
+    startingNumberBox.startNr = 0;
     startingNumberBox.onkeypress = isNumber;
     startingNumberBox.onkeyup = changeStartNumber;
     startingNumberBox.onclick = selectAllContent;
 
     var endingNumberBox = document.getElementById("endingNumberBox");
+    endingNumberBox.endNr = 100;
     endingNumberBox.onkeypress = isNumber;
     endingNumberBox.onkeyup = changeEndNumber;
     //endingNumberBox.onclick = selectAllContent;
@@ -178,6 +178,34 @@
         numberErrorDiv.style.visibility = "hidden"; //The reason behind this is to keep the page the same and not have everything move down when it appears or up when it's empty.
     }
         
+    function changeNumbers() {
+        var testNr;
+        if (this.startNr) {
+            testNr = startingNumberBox.value + "";
+            if (testNr > 9999)
+                testNr = 9999;
+            if (testNr < this.endNr) {
+                startNr = testNr;
+            } else {
+                numberErrorDiv.textContent = "The starting number cannot be bigger than the ending number";
+            }
+            startingNumberBox.value = testNr;
+        } else if (this.endNr) {
+            testNr = endingNumberBox.value + "";
+            if (testNr > 9999)
+                testNr = 9999;
+            if (testNr > this.startNr) {
+                endNr = testNr;
+            } else {
+                numberErrorDiv.textContent = "The ending number cannot be smaller than the starting number";
+            }
+            endingNumberBox.value = testNr;
+        }
+        numberErrorDiv.style.visibility = "visible";
+        clearTimeout(errorTimer);
+        errorTimer = setTimeout(removeErrorMsg, 3000);
+        changeDisplayNumbers();
+    }
 
     function changeStartNumber() {
         var testNr = startingNumberBox.value + ""; // Turn into a string so we can check the first character
@@ -202,15 +230,12 @@
 
     function changeEndNumber() {
         var testNr = endingNumberBox.value + "";
-        if (testNr[0] == 0) {
-            testNr = testNr.substr(1); 
-        }
         testNr = Number(testNr); 
         if (testNr > 9999) {
             testNr = 9999;
         }
-        if (testNr > +startNr ) {
-            endNr = Number(testNr);
+        if (testNr > startNr ) {
+            endNr = testNr;
         } else {
             numberErrorDiv.textContent = "The ending number cannot be smaller than the starting number";
             numberErrorDiv.style.visibility = "visible";
